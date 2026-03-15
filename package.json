@@ -1,0 +1,16 @@
+{
+  "name": "we-ai-prototype",
+  "version": "1.0.0",
+  "description": "Council Mode AI - WE-AI prototype demonstrating plural perspectives",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
