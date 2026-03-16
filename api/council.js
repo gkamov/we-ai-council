@@ -81,6 +81,7 @@ Keep your response focused and concise (2-3 paragraphs max).`
 };
 
 module.exports = async (req, res) => {
+  console.log("API KEY:", process.env.ANTHROPIC_API_KEY?.slice(0, 10));
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
