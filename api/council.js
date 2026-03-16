@@ -51,11 +51,10 @@ Return ONLY valid JSON with this exact structure:
   "consensus": <number 0-100 representing overall agreement level>,
   "conclusion": "<2-3 sentence synthesis of where perspectives align>",
   "perspectives": [
-    {
-      "key": "<perspective key>",
-      "support": <number 0-100>,
-      "summary": "<2-3 sentence focused summary of this perspective's view>"
-    }
+    { "key": "strategic", "support": <0-100>, "summary": "<2-3 sentence summary>" },
+    { "key": "human", "support": <0-100>, "summary": "<2-3 sentence summary>" },
+    { "key": "risk", "support": <0-100>, "summary": "<2-3 sentence summary>" },
+    { "key": "innovation", "support": <0-100>, "summary": "<2-3 sentence summary>" }
   ],
   "tensions": ["<tension 1>", "<tension 2>", "<tension 3>"],
   "cruxes": [
