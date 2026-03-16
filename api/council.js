@@ -4,146 +4,159 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Define the three perspective lenses
-const PERSPECTIVES = {
-  efficiency: {
-    name: "Efficiency Lens",
-    systemPrompt: `You are the Efficiency perspective in a council of three AI advisors. 
-
-Your role is to analyze questions through the lens of:
-- Productivity and resource optimization
-- Speed and execution
-- Cost-effectiveness
-- Practical implementation
-- Getting things done
-
-You should:
-- Focus exclusively on efficiency-related factors
-- Be direct and action-oriented
-- Highlight what makes something faster, cheaper, or more streamlined
-- Point out inefficiencies and waste
-
-You do NOT need to:
-- Consider other perspectives (risk, innovation) - other council members handle those
-- Provide a balanced view - you represent ONE lens
-- Synthesize or compromise - just present the efficiency case clearly
-
-Keep your response focused and concise (2-3 paragraphs max).`
+const PERSPECTIVES = [
+  {
+    key: 'strategic',
+    name: 'Strategic Lens',
+    icon: '🎯',
+    color: '#6366f1',
+    prompt: `You are the Strategic perspective in a WE-AI council. Analyze through the lens of long-term positioning, competitive advantage, mission alignment, and strategic coherence. Be direct, specific, and avoid hedging. Focus ONLY on strategic considerations.`
   },
-  risk: {
-    name: "Risk Lens",
-    systemPrompt: `You are the Risk perspective in a council of three AI advisors.
-
-Your role is to analyze questions through the lens of:
-- What could go wrong
-- Safety and security concerns
-- Constraints and limitations
-- Unintended consequences
-- Long-term sustainability
-
-You should:
-- Focus exclusively on risk-related factors
-- Be cautious and thorough
-- Highlight potential problems and failure modes
-- Point out what needs protection or mitigation
-
-You do NOT need to:
-- Consider other perspectives (efficiency, innovation) - other council members handle those
-- Provide a balanced view - you represent ONE lens
-- Minimize risks to seem optimistic - your job is to surface them
-
-Keep your response focused and concise (2-3 paragraphs max).`
+  {
+    key: 'human',
+    name: 'Human Lens',
+    icon: '🤝',
+    color: '#ec4899',
+    prompt: `You are the Human perspective in a WE-AI council. Analyze through the lens of people impact — morale, culture, fairness, wellbeing, trust, and relationships. Be direct and specific. Focus ONLY on human/people considerations.`
   },
-  innovation: {
-    name: "Innovation Lens",
-    systemPrompt: `You are the Innovation perspective in a council of three AI advisors.
-
-Your role is to analyze questions through the lens of:
-- Novel approaches and fresh thinking
-- Long-term value creation
-- Learning and growth opportunities
-- Creative possibilities
-- Strategic positioning
-
-You should:
-- Focus exclusively on innovation-related factors
-- Be imaginative and forward-thinking
-- Highlight opportunities for breakthroughs
-- Point out what enables future capability
-
-You do NOT need to:
-- Consider other perspectives (efficiency, risk) - other council members handle those
-- Provide a balanced view - you represent ONE lens
-- Be practical or realistic - your job is to push possibilities
-
-Keep your response focused and concise (2-3 paragraphs max).`
+  {
+    key: 'risk',
+    name: 'Risk Lens',
+    icon: '🛡️',
+    color: '#f59e0b',
+    prompt: `You are the Risk perspective in a WE-AI council. Analyze through the lens of what could go wrong — financial, reputational, operational, and unintended consequences. Be direct and specific. Focus ONLY on risk considerations.`
+  },
+  {
+    key: 'innovation',
+    name: 'Innovation Lens',
+    icon: '💡',
+    color: '#10b981',
+    prompt: `You are the Innovation perspective in a WE-AI council. Analyze through the lens of creative possibilities, novel approaches, learning opportunities, and future capability. Be direct and specific. Focus ONLY on innovation considerations.`
   }
-};
+];
+
+const SYNTHESIS_PROMPT = `You are the synthesis layer of a WE-AI council. You have received analysis from four perspectives on a question. Your job is to produce a structured JSON synthesis.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "consensus": <number 0-100 representing overall agreement level>,
+  "conclusion": "<2-3 sentence synthesis of where perspectives align>",
+  "perspectives": [
+    {
+      "key": "<perspective key>",
+      "support": <number 0-100>,
+      "summary": "<2-3 sentence focused summary of this perspective's view>"
+    }
+  ],
+  "tensions": ["<tension 1>", "<tension 2>", "<tension 3>"],
+  "cruxes": [
+    {
+      "question": "<the key question that determines the answer>",
+      "ifYes": "<what follows if yes>",
+      "ifNo": "<what follows if no>"
+    }
+  ],
+  "recommendation": "<concrete actionable recommendation, or null if no consensus>",
+  "honesty": "<what this question cannot be answered without — values clarification, missing data, etc>"
+}
+
+Rules:
+- consensus below 50 means real disagreement — be honest about it
+- tensions should be genuine unresolved conflicts between perspectives, not just observations
+- cruxes should be the 1-2 pivotal questions where different answers lead to different conclusions
+- recommendation should be null if consensus is below 40
+- honesty should name what the asker needs to decide or discover before acting
+- Return ONLY the JSON object, no markdown, no explanation`;
 
 module.exports = async (req, res) => {
-  console.log("API KEY:", process.env.ANTHROPIC_API_KEY?.slice(0, 10));
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  );
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  if (req.method === 'OPTIONS') { res.status(200).end(); return; }
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
     const { question } = req.body;
-    
-    if (!question) {
-      return res.status(400).json({ error: 'Question is required' });
-    }
+    if (!question) return res.status(400).json({ error: 'Question is required' });
 
     console.log(`\n=== Council Question ===\n${question}\n`);
 
-    // Call Claude three times in parallel, each with a different perspective
-    const perspectivePromises = Object.entries(PERSPECTIVES).map(async ([key, perspective]) => {
-      const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: perspective.systemPrompt,
-        messages: [{
-          role: 'user',
-          content: question
-        }]
-      });
+    // Get all 4 perspectives in parallel
+    const perspectiveResponses = await Promise.all(
+      PERSPECTIVES.map(async (p) => {
+        const message = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 600,
+          system: p.prompt,
+          messages: [{ role: 'user', content: question }]
+        });
+        return { key: p.key, text: message.content[0].text };
+      })
+    );
 
-      const response = message.content[0].text;
-      console.log(`\n=== ${perspective.name} ===\n${response}\n`);
+    // Build synthesis prompt with all perspectives
+    const perspectivesText = perspectiveResponses.map(pr => {
+      const meta = PERSPECTIVES.find(p => p.key === pr.key);
+      return `=== ${meta.name} ===\n${pr.text}`;
+    }).join('\n\n');
 
+    const synthesisMessage = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: SYNTHESIS_PROMPT,
+      messages: [{
+        role: 'user',
+        content: `Question: "${question}"\n\nPerspectives:\n\n${perspectivesText}`
+      }]
+    });
+
+    let synthesis;
+    try {
+      synthesis = JSON.parse(synthesisMessage.content[0].text);
+    } catch (e) {
+      console.error('Failed to parse synthesis JSON:', synthesisMessage.content[0].text);
+      synthesis = {
+        consensus: 50,
+        conclusion: "The council reached mixed views on this question.",
+        perspectives: PERSPECTIVES.map(p => ({ key: p.key, support: 50, summary: "" })),
+        tensions: [],
+        cruxes: [],
+        recommendation: null,
+        honesty: "Further clarification needed."
+      };
+    }
+
+    // Merge perspective metadata with synthesis summaries
+    const enrichedPerspectives = PERSPECTIVES.map(meta => {
+      const synthP = synthesis.perspectives?.find(p => p.key === meta.key) || {};
+      const rawP = perspectiveResponses.find(p => p.key === meta.key) || {};
       return {
-        lens: key,
-        name: perspective.name,
-        response: response
+        key: meta.key,
+        name: meta.name,
+        icon: meta.icon,
+        color: meta.color,
+        support: synthP.support ?? 50,
+        summary: synthP.summary || '',
+        fullResponse: rawP.text || ''
       };
     });
 
-    const perspectives = await Promise.all(perspectivePromises);
-
     res.status(200).json({
       question,
-      perspectives,
+      consensus: synthesis.consensus,
+      conclusion: synthesis.conclusion,
+      perspectives: enrichedPerspectives,
+      tensions: synthesis.tensions || [],
+      cruxes: synthesis.cruxes || [],
+      recommendation: synthesis.recommendation || null,
+      honesty: synthesis.honesty || null,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
     console.error('Error calling council:', error);
-    res.status(500).json({ 
-      error: 'Failed to get council perspectives',
-      details: error.message 
-    });
+    res.status(500).json({ error: 'Failed to get council perspectives', details: error.message });
   }
 };

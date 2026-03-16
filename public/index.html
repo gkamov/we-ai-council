@@ -4,448 +4,712 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WE-AI Council Mode</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg: #0f0f14;
+      --surface: #16161f;
+      --surface2: #1e1e2a;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e6f0;
+      --text-muted: #8884a0;
+      --text-dim: #5a5870;
+      --accent: #7c6af7;
+      --accent-glow: rgba(124,106,247,0.15);
+      --strategic: #6366f1;
+      --human: #ec4899;
+      --risk: #f59e0b;
+      --innovation: #10b981;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 48px 24px;
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+    .container { max-width: 900px; margin: 0 auto; }
 
-    header {
-      background: rgba(255, 255, 255, 0.98);
-      padding: 50px 40px;
-      border-radius: 16px;
-      margin-bottom: 40px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      backdrop-filter: blur(10px);
+    /* HEADER */
+    .header {
       text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .council-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(124,106,247,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #a89ef8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .council-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: #7c6af7;
+      border-radius: 50%;
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
     }
 
     h1 {
-      font-size: 48px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(36px, 6vw, 56px);
+      color: var(--text);
+      line-height: 1.1;
       margin-bottom: 16px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.02em;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: #a89ef8;
     }
 
     .tagline {
-      color: #4a5568;
-      font-size: 20px;
-      margin-bottom: 12px;
-      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 17px;
+      font-weight: 300;
+      margin-bottom: 8px;
     }
 
     .principle {
-      color: #718096;
-      font-size: 16px;
+      color: var(--text-dim);
+      font-size: 14px;
       font-style: italic;
-      font-weight: 400;
     }
 
+    /* INPUT */
     .input-section {
-      background: rgba(255, 255, 255, 0.98);
-      padding: 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
-      margin-bottom: 40px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-      backdrop-filter: blur(10px);
-    }
-
-    .input-group {
-      display: flex;
-      gap: 16px;
-      flex-direction: column;
+      padding: 32px;
+      margin-bottom: 32px;
     }
 
     textarea {
       width: 100%;
-      padding: 20px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: inherit;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
       resize: vertical;
-      min-height: 120px;
-      transition: all 0.3s ease;
-      background: white;
+      min-height: 110px;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
     }
 
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
+    textarea::placeholder { color: var(--text-dim); }
+    textarea:focus { outline: none; border-color: var(--accent); }
 
-    button {
-      padding: 18px 36px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .ask-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
       color: white;
       border: none;
-      border-radius: 12px;
-      font-size: 17px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      transition: all 0.2s;
+      letter-spacing: 0.01em;
     }
 
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    .ask-btn:hover:not(:disabled) { background: #8b7bf8; transform: translateY(-1px); }
+    .ask-btn:disabled { background: var(--surface2); color: var(--text-dim); cursor: not-allowed; }
+
+    .examples {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
     }
 
-    button:disabled {
-      background: #cbd5e0;
-      cursor: not-allowed;
-      box-shadow: none;
-      transform: none;
+    .examples-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
     }
 
-    .council-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 24px;
-      margin-bottom: 40px;
+    .example-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      padding: 8px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
     }
 
-    .perspective-card {
-      background: rgba(255, 255, 255, 0.98);
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-    }
+    .chip:hover { border-color: var(--accent); color: var(--text); background: var(--accent-glow); }
 
-    .perspective-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    }
-
-    .perspective-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
-      padding-bottom: 20px;
-      border-bottom: 3px solid;
-    }
-
-    .efficiency .perspective-header {
-      border-color: #48bb78;
-    }
-
-    .risk .perspective-header {
-      border-color: #f56565;
-    }
-
-    .innovation .perspective-header {
-      border-color: #9f7aea;
-    }
-
-    .lens-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .efficiency .lens-icon {
-      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    }
-
-    .risk .lens-icon {
-      background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    }
-
-    .innovation .lens-icon {
-      background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-    }
-
-    .lens-name {
-      font-size: 20px;
-      font-weight: 700;
-      color: #2d3748;
-      letter-spacing: -0.3px;
-    }
-
-    .perspective-content {
-      color: #4a5568;
-      line-height: 1.7;
-      font-size: 15px;
-    }
-
+    /* LOADING */
     .loading {
       text-align: center;
-      padding: 80px;
-      color: white;
-      background: rgba(255, 255, 255, 0.95);
+      padding: 64px 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      margin-bottom: 32px;
     }
 
-    .loading-spinner {
-      border: 4px solid rgba(102, 126, 234, 0.1);
-      border-top: 4px solid #667eea;
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 24px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
     }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
+    .loading p { color: var(--text-muted); font-size: 15px; }
+    .loading small { color: var(--text-dim); font-size: 13px; margin-top: 6px; display: block; }
+
+    /* ERROR */
     .error {
-      background: #fff5f5;
-      color: #c53030;
-      padding: 24px;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
       border-radius: 12px;
-      margin: 24px 0;
-      border: 2px solid #feb2b2;
-      box-shadow: 0 4px 12px rgba(197, 48, 48, 0.1);
-    }
-
-    .example-questions {
-      background: rgba(247, 250, 252, 0.8);
-      padding: 24px;
-      border-radius: 12px;
-      margin-top: 20px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .example-questions h3 {
+      padding: 20px 24px;
+      color: #f87171;
+      margin-bottom: 32px;
       font-size: 14px;
-      color: #4a5568;
-      margin-bottom: 12px;
+    }
+
+    /* RESULTS */
+    .question-display {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+
+    .question-display .label {
+      font-size: 11px;
       font-weight: 600;
+      color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
     }
 
-    .example-button {
-      display: inline-block;
-      padding: 10px 16px;
-      background: white;
-      color: #667eea;
-      border-radius: 8px;
-      margin: 6px 6px 6px 0;
-      font-size: 14px;
-      cursor: pointer;
-      border: 2px solid #e2e8f0;
-      transition: all 0.2s ease;
-      font-weight: 500;
+    .question-display p {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text);
+      line-height: 1.5;
     }
 
-    .example-button:hover {
-      background: #667eea;
-      color: white;
-      border-color: #667eea;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-    }
-
-    .your-question {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 28px;
+    /* CONSENSUS */
+    .consensus-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
-      margin-bottom: 40px;
-      border-left: 5px solid #667eea;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 28px 32px;
+      margin-bottom: 24px;
     }
 
-    .your-question h2 {
-      font-size: 13px;
-      color: #667eea;
-      margin-bottom: 12px;
+    .consensus-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .consensus-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
       text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
+      letter-spacing: 0.1em;
     }
 
-    .your-question p {
-      font-size: 19px;
-      color: #2d3748;
-      line-height: 1.6;
+    .consensus-score {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--text);
+    }
+
+    .consensus-bar {
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .consensus-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, #6366f1, #10b981);
+      transition: width 1s ease;
+    }
+
+    .no-consensus {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fbbf24;
+      font-size: 14px;
       font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .conclusion {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* PERSPECTIVES GRID */
+    .perspectives-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 640px) { .perspectives-grid { grid-template-columns: 1fr; } }
+
+    .perspective-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .perspective-card:hover { border-color: rgba(255,255,255,0.12); }
+
+    .perspective-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .perspective-card[data-key="strategic"]::before { background: var(--strategic); }
+    .perspective-card[data-key="human"]::before { background: var(--human); }
+    .perspective-card[data-key="risk"]::before { background: var(--risk); }
+    .perspective-card[data-key="innovation"]::before { background: var(--innovation); }
+
+    .p-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .p-name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .p-icon { font-size: 16px; }
+
+    .p-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .perspective-card[data-key="strategic"] .p-badge { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .perspective-card[data-key="human"] .p-badge { background: rgba(236,72,153,0.15); color: #f472b6; }
+    .perspective-card[data-key="risk"] .p-badge { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .perspective-card[data-key="innovation"] .p-badge { background: rgba(16,185,129,0.15); color: #34d399; }
+
+    .p-bar {
+      height: 3px;
+      background: var(--surface2);
+      border-radius: 100px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .p-bar-fill { height: 100%; border-radius: 100px; }
+    .perspective-card[data-key="strategic"] .p-bar-fill { background: var(--strategic); }
+    .perspective-card[data-key="human"] .p-bar-fill { background: var(--human); }
+    .perspective-card[data-key="risk"] .p-bar-fill { background: var(--risk); }
+    .perspective-card[data-key="innovation"] .p-bar-fill { background: var(--innovation); }
+
+    .p-summary {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* FULL RESPONSE TOGGLE */
+    .p-expand {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .p-expand:hover { color: var(--text-muted); }
+
+    .p-full {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* SECTIONS */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    /* TENSIONS */
+    .tension-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tension-item:last-child { border-bottom: none; }
+
+    .tension-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #fbbf24;
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    /* CRUXES */
+    .crux-item {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+
+    .crux-item:last-child { margin-bottom: 0; }
+
+    .crux-question {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .crux-outcomes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    @media (max-width: 500px) { .crux-outcomes { grid-template-columns: 1fr; } }
+
+    .crux-yes, .crux-no {
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .crux-yes { background: rgba(16,185,129,0.1); color: #6ee7b7; }
+    .crux-yes::before { content: 'If yes: '; font-weight: 600; }
+
+    .crux-no { background: rgba(239,68,68,0.1); color: #fca5a5; }
+    .crux-no::before { content: 'If no: '; font-weight: 600; }
+
+    /* RECOMMENDATION */
+    .recommendation {
+      background: rgba(124,106,247,0.08);
+      border: 1px solid rgba(124,106,247,0.2);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+
+    .rec-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a89ef8;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .rec-text {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* HONESTY */
+    .honesty {
+      background: rgba(245,158,11,0.06);
+      border: 1px solid rgba(245,158,11,0.15);
+      border-radius: 14px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+    }
+
+    .honesty-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    .honesty-text {
+      font-size: 14px;
+      color: #fde68a;
+      line-height: 1.7;
+      opacity: 0.85;
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="container">
+    <div class="header">
+      <div class="council-badge">WE-AI Council Mode</div>
+      <h1>See multiple perspectives.<br><em>Choose consciously.</em></h1>
+      <p class="tagline">Plurality over synthesis. Tensions over false consensus.</p>
+      <p class="principle">From "The Adolescence of Humanity" — Georgi Kamov</p>
+    </div>
 
-  <script type="text/babel">
-    const { useState } = React;
+    <div class="input-section">
+      <textarea id="questionInput" placeholder="Ask a question where multiple perspectives matter...&#10;&#10;Example: Should we prioritize speed or quality in this project?" rows="4"></textarea>
+      <button class="ask-btn" id="askBtn" onclick="askCouncil()">Ask Council</button>
 
-    const EXAMPLE_QUESTIONS = [
-      "Should we launch this new feature next week or wait another month?",
-      "How should we respond to our competitor's price cut?",
-      "Should we hire 3 specialists or 5 generalists?",
-      "Is it better to focus on existing customers or new market segments?"
-    ];
-
-    // Use relative path for Vercel, fallback to localhost for local dev
-    const API_URL = window.location.hostname === 'localhost' 
-      ? 'http://localhost:3001' 
-      : '';
-
-    function CouncilMode() {
-      const [question, setQuestion] = useState('');
-      const [loading, setLoading] = useState(false);
-      const [council, setCouncil] = useState(null);
-      const [error, setError] = useState(null);
-
-      const askCouncil = async () => {
-        if (!question.trim()) return;
-
-        setLoading(true);
-        setError(null);
-        setCouncil(null);
-
-        try {
-          const response = await fetch(`${API_URL}/api/council`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ question: question.trim() })
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to get council response');
-          }
-
-          const data = await response.json();
-          setCouncil(data);
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && e.ctrlKey) {
-          askCouncil();
-        }
-      };
-
-      const loadExample = (exampleQuestion) => {
-        setQuestion(exampleQuestion);
-      };
-
-      return (
-        <div className="container">
-          <header>
-            <h1>WE-AI Council Mode</h1>
-            <p className="tagline">See multiple perspectives. Choose consciously.</p>
-            <p className="principle">Plurality over synthesis. Tensions over false consensus.</p>
-          </header>
-
-          <div className="input-section">
-            <div className="input-group">
-              <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Ask a question where multiple perspectives matter...
-
-Example: Should we prioritize speed or quality in this project?"
-                disabled={loading}
-              />
-              <button onClick={askCouncil} disabled={loading || !question.trim()}>
-                {loading ? 'Consulting Council...' : 'Ask Council'}
-              </button>
-            </div>
-
-            <div className="example-questions">
-              <h3>Try these examples:</h3>
-              {EXAMPLE_QUESTIONS.map((eq, i) => (
-                <button
-                  key={i}
-                  className="example-button"
-                  onClick={() => loadExample(eq)}
-                  disabled={loading}
-                >
-                  {eq}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {error && (
-            <div className="error">
-              <strong>Error:</strong> {error}
-              <br />
-              <small>Make sure the backend server is running on port 3001</small>
-            </div>
-          )}
-
-          {loading && (
-            <div className="loading">
-              <div className="loading-spinner"></div>
-              <p>Council deliberating...</p>
-            </div>
-          )}
-
-          {council && (
-            <>
-              <div className="your-question">
-                <h2>Your Question</h2>
-                <p>{council.question}</p>
-              </div>
-
-              <div className="council-grid">
-                {council.perspectives.map((p) => (
-                  <div key={p.lens} className={`perspective-card ${p.lens}`}>
-                    <div className="perspective-header">
-                      <div className="lens-icon">
-                        {p.lens === 'efficiency' && '⚡'}
-                        {p.lens === 'risk' && '🛡️'}
-                        {p.lens === 'innovation' && '💡'}
-                      </div>
-                      <div className="lens-name">{p.name}</div>
-                    </div>
-                    <div className="perspective-content">
-                      {p.response}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+      <div class="examples">
+        <div class="examples-label">Try these examples</div>
+        <div class="example-chips">
+          <div class="chip" onclick="loadExample(this)">Should we launch this new feature next week or wait?</div>
+          <div class="chip" onclick="loadExample(this)">How should we respond to our competitor's price cut?</div>
+          <div class="chip" onclick="loadExample(this)">Should we hire 3 specialists or 5 generalists?</div>
+          <div class="chip" onclick="loadExample(this)">Focus on existing customers or new market segments?</div>
         </div>
-      );
+      </div>
+    </div>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const API_URL = window.location.hostname === 'localhost' ? 'http://localhost:3001' : '';
+    const expandedCards = new Set();
+
+    function loadExample(el) {
+      document.getElementById('questionInput').value = el.textContent;
     }
 
-    ReactDOM.render(<CouncilMode />, document.getElementById('root'));
+    document.getElementById('questionInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.ctrlKey) askCouncil();
+    });
+
+    function renderMarkdown(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        .replace(/^/, '<p>')
+        .replace(/$/, '</p>');
+    }
+
+    function toggleExpand(key) {
+      const el = document.getElementById(`full-${key}`);
+      const btn = document.getElementById(`btn-${key}`);
+      if (el.style.display === 'none') {
+        el.style.display = 'block';
+        btn.textContent = '▲ Show less';
+      } else {
+        el.style.display = 'none';
+        btn.textContent = '▼ Read full perspective';
+      }
+    }
+
+    async function askCouncil() {
+      const question = document.getElementById('questionInput').value.trim();
+      if (!question) return;
+
+      const btn = document.getElementById('askBtn');
+      btn.disabled = true;
+      btn.textContent = 'Consulting Council...';
+
+      document.getElementById('output').innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Council deliberating…</p>
+          <small>Four perspectives + synthesis • ~10 seconds</small>
+        </div>`;
+
+      try {
+        const res = await fetch(`${API_URL}/api/council`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question })
+        });
+
+        if (!res.ok) throw new Error('Council failed to respond');
+        const data = await res.json();
+        renderResults(data);
+      } catch (err) {
+        document.getElementById('output').innerHTML = `
+          <div class="error"><strong>Error:</strong> ${err.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Ask Council';
+      }
+    }
+
+    function renderResults(data) {
+      const consensusHTML = data.consensus !== null
+        ? `<div class="consensus-header">
+             <span class="consensus-label">Council Consensus</span>
+             <span class="consensus-score">${data.consensus}%</span>
+           </div>
+           <div class="consensus-bar">
+             <div class="consensus-fill" style="width: ${data.consensus}%"></div>
+           </div>`
+        : `<div class="no-consensus">⚠️ No consensus reached</div>`;
+
+      const perspectivesHTML = data.perspectives.map(p => `
+        <div class="perspective-card" data-key="${p.key}">
+          <div class="perspective-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <span class="p-name"><span class="p-icon">${p.icon}</span>${p.name}</span>
+            <span class="p-badge">${p.support}%</span>
+          </div>
+          <div class="p-bar"><div class="p-bar-fill" style="width:${p.support}%"></div></div>
+          <div class="p-summary">${p.summary}</div>
+          <button class="p-expand" id="btn-${p.key}" onclick="toggleExpand('${p.key}')">▼ Read full perspective</button>
+          <div class="p-full" id="full-${p.key}" style="display:none">${renderMarkdown(p.fullResponse)}</div>
+        </div>`).join('');
+
+      const tensionsHTML = data.tensions?.length ? `
+        <div class="section">
+          <div class="section-title">⚡ Unresolved Tensions</div>
+          ${data.tensions.map(t => `
+            <div class="tension-item">
+              <div class="tension-dot"></div>
+              <span>${t}</span>
+            </div>`).join('')}
+        </div>` : '';
+
+      const cruxesHTML = data.cruxes?.length ? `
+        <div class="section">
+          <div class="section-title">🔑 Key Cruxes — questions that change everything</div>
+          ${data.cruxes.map(c => `
+            <div class="crux-item">
+              <div class="crux-question">${c.question}</div>
+              <div class="crux-outcomes">
+                <div class="crux-yes">${c.ifYes}</div>
+                <div class="crux-no">${c.ifNo}</div>
+              </div>
+            </div>`).join('')}
+        </div>` : '';
+
+      const recommendationHTML = data.recommendation ? `
+        <div class="recommendation">
+          <div class="rec-label">Council Recommendation</div>
+          <div class="rec-text">${data.recommendation}</div>
+        </div>` : '';
+
+      const honestyHTML = data.honesty ? `
+        <div class="honesty">
+          <div class="honesty-label">Epistemic Honesty</div>
+          <div class="honesty-text">${data.honesty}</div>
+        </div>` : '';
+
+      document.getElementById('output').innerHTML = `
+        <div class="question-display">
+          <div class="label">Your Question</div>
+          <p>${data.question}</p>
+        </div>
+
+        <div class="consensus-block">
+          ${consensusHTML}
+          <div class="conclusion">${data.conclusion}</div>
+        </div>
+
+        <div class="perspectives-grid">${perspectivesHTML}</div>
+
+        ${tensionsHTML}
+        ${cruxesHTML}
+        ${recommendationHTML}
+        ${honestyHTML}
+      `;
+    }
   </script>
 </body>
 </html>
