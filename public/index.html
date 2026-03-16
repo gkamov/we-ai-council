@@ -224,18 +224,18 @@
     }
 
     .question-display .label {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
     }
 
     .question-display p {
       font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      color: var(--text);
+      font-size: 22px;
+      color: #ffffff;
       line-height: 1.5;
     }
 
@@ -256,17 +256,17 @@
     }
 
     .consensus-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-dim);
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.12em;
     }
 
     .consensus-score {
       font-family: 'DM Serif Display', serif;
-      font-size: 28px;
-      color: var(--text);
+      font-size: 36px;
+      color: #ffffff;
     }
 
     .consensus-bar {
@@ -415,6 +415,45 @@
     .p-full p { margin-bottom: 10px; }
     .p-full p:last-child { margin-bottom: 0; }
 
+    .md-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin: 16px 0 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .md-heading:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+    .md-subheading {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 12px 0 6px;
+    }
+
+    .md-list-item {
+      padding: 3px 0 3px 16px;
+      position: relative;
+      font-size: 15px;
+      color: #ffffff;
+      line-height: 1.6;
+    }
+
+    .md-list-item::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--text-muted);
+    }
+
+    .md-numbered::before {
+      content: none;
+    }
+
     /* SECTIONS */
     .section {
       background: var(--surface);
@@ -427,13 +466,15 @@
     .section-title {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-dim);
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 16px;
+      letter-spacing: 0.12em;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
     }
 
     /* TENSIONS */
@@ -507,12 +548,14 @@
     }
 
     .rec-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #a89ef8;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(124,106,247,0.2);
     }
 
     .rec-text {
@@ -531,12 +574,14 @@
     }
 
     .honesty-label {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       color: #fbbf24;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 8px;
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(245,158,11,0.2);
     }
 
     .honesty-text {
@@ -587,10 +632,29 @@
 
     function renderMarkdown(text) {
       return text
+        // Strip leading title line (ALL CAPS line at start, or first line ending in colon if alone)
+        .replace(/^[A-Z][A-Z\s\-:]+\n/, '')
+        // ### subheadings → styled subheading
+        .replace(/^### (.+)$/gm, '<div class="md-subheading">$1</div>')
+        // ## headings → styled heading  
+        .replace(/^## (.+)$/gm, '<div class="md-heading">$1</div>')
+        // ALL CAPS heading lines (e.g. "COMPETITIVE POSITIONING ANALYSIS") → heading
+        .replace(/^([A-Z][A-Z\s\-\/]{4,})$/gm, '<div class="md-heading">$1</div>')
+        // "Heading:" lines (Title Case word(s) followed by colon at line start) → subheading
+        .replace(/^([A-Z][a-zA-Z\s&]+:)$/gm, '<div class="md-subheading">$1</div>')
+        // Bold
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Italic
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Numbered list items
+        .replace(/^\d+\.\s(.+)$/gm, '<div class="md-list-item md-numbered">$1</div>')
+        // Bullet list items (- or •)
+        .replace(/^[-•]\s(.+)$/gm, '<div class="md-list-item">$1</div>')
+        // Double newlines → paragraph breaks
         .replace(/\n\n/g, '</p><p>')
+        // Single newlines
         .replace(/\n/g, '<br>')
+        // Wrap in paragraph
         .replace(/^/, '<p>')
         .replace(/$/, '</p>');
     }

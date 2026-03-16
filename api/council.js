@@ -4,34 +4,43 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const FORMAT_INSTRUCTION = `
+
+FORMAT YOUR RESPONSE like this — no title at the top, no preamble:
+- Use ALL CAPS lines for major section headings (e.g. KEY CONCERNS, OPPORTUNITIES, RECOMMENDATION)
+- Use "Subheading:" style (title case + colon) for sub-points within sections
+- Use bullet points (- ) for lists
+- Keep paragraphs short (2-3 sentences)
+- Do NOT start with a title or restate the lens name`;
+
 const PERSPECTIVES = [
   {
     key: 'strategic',
     name: 'Strategic Lens',
     icon: '🎯',
     color: '#6366f1',
-    prompt: `You are the Strategic perspective in a WE-AI council. Analyze through the lens of long-term positioning, competitive advantage, mission alignment, and strategic coherence. Be direct, specific, and avoid hedging. Focus ONLY on strategic considerations.`
+    prompt: `You are the Strategic perspective in a WE-AI council. Analyze through the lens of long-term positioning, competitive advantage, mission alignment, and strategic coherence. Be direct, specific, and avoid hedging. Focus ONLY on strategic considerations.` + FORMAT_INSTRUCTION
   },
   {
     key: 'human',
     name: 'Human Lens',
     icon: '🤝',
     color: '#ec4899',
-    prompt: `You are the Human perspective in a WE-AI council. Analyze through the lens of people impact — morale, culture, fairness, wellbeing, trust, and relationships. Be direct and specific. Focus ONLY on human/people considerations.`
+    prompt: `You are the Human perspective in a WE-AI council. Analyze through the lens of people impact — morale, culture, fairness, wellbeing, trust, and relationships. Be direct and specific. Focus ONLY on human/people considerations.` + FORMAT_INSTRUCTION
   },
   {
     key: 'risk',
     name: 'Risk Lens',
     icon: '🛡️',
     color: '#f59e0b',
-    prompt: `You are the Risk perspective in a WE-AI council. Analyze through the lens of what could go wrong — financial, reputational, operational, and unintended consequences. Be direct and specific. Focus ONLY on risk considerations.`
+    prompt: `You are the Risk perspective in a WE-AI council. Analyze through the lens of what could go wrong — financial, reputational, operational, and unintended consequences. Be direct and specific. Focus ONLY on risk considerations.` + FORMAT_INSTRUCTION
   },
   {
     key: 'innovation',
     name: 'Innovation Lens',
     icon: '💡',
     color: '#10b981',
-    prompt: `You are the Innovation perspective in a WE-AI council. Analyze through the lens of creative possibilities, novel approaches, learning opportunities, and future capability. Be direct and specific. Focus ONLY on innovation considerations.`
+    prompt: `You are the Innovation perspective in a WE-AI council. Analyze through the lens of creative possibilities, novel approaches, learning opportunities, and future capability. Be direct and specific. Focus ONLY on innovation considerations.` + FORMAT_INSTRUCTION
   }
 ];
 
